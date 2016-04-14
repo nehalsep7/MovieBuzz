@@ -8,6 +8,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/moviePoster"
         android:minHeight="200dp"
-        android:src="@drawable/movieimage" />
+        android:src="@drawable/movieimage"
+        android:adjustViewBounds="true"/>
 
 </LinearLayout>
