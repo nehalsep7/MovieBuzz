@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MovieBuzz App</string>
+    <string-array name="sortBy_list">
+        <item>Sort by Popularity</item>
+        <item>Sort by Rating</item>
+    </string-array>
+</resources>
