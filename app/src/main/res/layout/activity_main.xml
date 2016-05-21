@@ -12,7 +12,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Movies"
+        android:text="Popular"
         android:id="@+id/textView"
         android:textStyle="bold"
         android:textSize="35dp"
@@ -25,6 +25,7 @@
         android:layout_below="@+id/textView"
         android:layout_alignParentStart="true"
         android:numColumns="2"
-        android:choiceMode="singleChoice" />
+        android:choiceMode="singleChoice"
+        android:stretchMode="columnWidth"/>
 
 </RelativeLayout>

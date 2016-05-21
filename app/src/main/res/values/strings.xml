@@ -4,4 +4,8 @@
         <item>Sort by Popularity</item>
         <item>Sort by Rating</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_detail_view">DetailView</string>
 </resources>

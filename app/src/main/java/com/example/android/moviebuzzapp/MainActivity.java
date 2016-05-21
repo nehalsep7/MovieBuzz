@@ -1,6 +1,9 @@
 package com.example.android.moviebuzzapp;
 
+import android.app.FragmentManager;
+import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -34,10 +37,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+public class MainActivity extends AppCompatActivity {
     MovieInfo movieInfo;
     ArrayList<String> MovieTitles = new ArrayList<String>();
     ArrayList<Bitmap> MoviePoster = new ArrayList<Bitmap>();
@@ -45,59 +51,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayList<String> MovieOverview = new ArrayList<String>();
     ArrayList<String> MovieLanguage = new ArrayList<String>();
     ArrayList<MovieInfo> MovieDetailList = new ArrayList<MovieInfo>();
+    ArrayList<VideoDetails> videoDetailsList = new ArrayList<VideoDetails>();
+    ArrayList<VideoDetails> fetchedList = new ArrayList<VideoDetails>();
     GridView gridView;
     MovieAdapter adapter;
     SQLiteDatabase movieDB;
     MovieInfo details;
-//    public byte[] getBytesFromBitmap(Bitmap bitmap) {
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
-//        return stream.toByteArray();
-//    }
-    public class MovieInfo{
-        public String posterURL;
-        public String popularity;
-        public String title;
-        public String overview;
-        public String language;
-        public String votes;
-        public  MovieInfo(){ super();}
-        public MovieInfo(String poster,String popularity,String title,String overview,String language,String votes){
-            super();
-            this.posterURL=poster;
-            this.popularity=popularity;
-            this.title=title;
-            this.overview=overview;
-            this.language=language;
-            this.votes=votes;
-        }
-        public String toString(){
-            return posterURL+" " + popularity + " " + title ;
-        }
-    }
+    FragmentManager manager;
+    VideoDetails videoDetails;
+    Map<Integer,ArrayList<VideoDetails>> videoMap = new HashMap<Integer,ArrayList<VideoDetails>>();
     public class MovieAdapter extends ArrayAdapter<MovieInfo>{
 
         public MovieAdapter(Context context, ArrayList<MovieInfo> movie) {
             super(context, R.layout.list_item,movie);
         }
 
-
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-           // return super.getView(position, convertView, parent);
             movieInfo = getItem(position);
             if(convertView == null){
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item,parent,false);
             }
-//            TextView movieTitle = (TextView)convertView.findViewById(R.id.movieName);
-//            TextView movieLang = (TextView)convertView.findViewById(R.id.movieLanguage);
             ImageView moviePoster = (ImageView)convertView.findViewById(R.id.moviePoster);
-//            TextView popularity = (TextView)convertView.findViewById(R.id.popularityView);
-//            movieTitle.setText(movieInfo.title);
-//            movieLang.setText(movieInfo.language);
-//            popularity.setText(movieInfo.popularity);
-           // moviePoster.setImageBitmap(movieInfo.poster);
             Picasso.with(getApplicationContext()).load(movieInfo.posterURL).into(moviePoster);
             return convertView;
         }
@@ -121,56 +96,71 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     result+=current;
                     data=reader.read();
                 }
-                //Bitmap myBitmap = BitmapFactory.decodeStream(inputStream);
-                // return myBitmap;
                 String posterUrl="";
                 String overview;
                 String popularity;
                 String title;
                 String language;
                 String voteAvg;
+                String movie_id;
+                String key;
+                String trailerName;
+                String trailerSite;
                 movieDB.execSQL("DELETE FROM Movie_details");
+
                 JSONObject jsonObject = new JSONObject(result);
                 JSONArray jsonArray = jsonObject.getJSONArray("results");
                 for(int i = 0; i<jsonArray.length();i++){
                     JSONObject jsonPart = jsonArray.getJSONObject(i);
                     posterUrl="http://image.tmdb.org/t/p/w185/"+jsonPart.getString("poster_path");
+                    movie_id = jsonPart.getString("id");
+                    Log.i("Movie Id",movie_id);
 
-//                    MovieDetails poster = new MovieDetails();
-//                    url = new URL("http://image.tmdb.org/t/p/w185/" + posterUrl);
-//                    httpURLConnection = (HttpURLConnection)url.openConnection();
-//                    httpURLConnection.connect();
-//                    inputStream = httpURLConnection.getInputStream();
-//                    Bitmap myBitmap = BitmapFactory.decodeStream(inputStream);
-
-                   // byte[] byteArray = getBytesFromBitmap(myBitmap);
                     overview=jsonPart.getString("overview");
                     popularity=jsonPart.getString("popularity");
                     title = jsonPart.getString("title");
                     language=jsonPart.getString("original_language");
                     voteAvg=jsonPart.getString("vote_average");
-                    Log.i("Poster Url",posterUrl);
-                    Log.i("Overview",overview);
-                    Log.i("Popularity",popularity);
-                    Log.i("Title", title);
                     MovieTitles.add(title);
                     MoviePopularity.add(popularity);
                     MovieOverview.add(overview);
                     MovieLanguage.add(language);
-                    String sql = "INSERT INTO Movie_details(posterURL,title,rating,votes,overview) VALUES ( ? , ? , ? , ? , ? )";
+                    String sql = "INSERT INTO Movie_details(movieId,posterURL,title,rating,votes,overview) VALUES ( ? , ? , ? , ? , ? , ? )";
                     SQLiteStatement statement = movieDB.compileStatement(sql);
-                    statement.bindString(1, posterUrl);
-                    statement.bindString(2,title);
-                    statement.bindString(3,popularity);
-                    statement.bindString(4,voteAvg);
-                    statement.bindString(5, overview);
+                    statement.bindString(1,movie_id);
+                    statement.bindString(2, posterUrl);
+                    statement.bindString(3,title);
+                    statement.bindString(4,popularity);
+                    statement.bindString(5,voteAvg);
+                    statement.bindString(6, overview);
                     statement.execute();
-                    //updateList();
-//                    MovieInfo details = new MovieInfo(myBitmap,popularity,title,overview,language,voteAvg);
-//                    MovieDetailList.add(details);
+                    url = new URL("http://api.themoviedb.org/3/movie/" +movie_id+ "/videos?api_key=42c195dfd3c7af3d02056ccdb542f2d5");
+                    httpURLConnection = (HttpURLConnection)url.openConnection();
+                    inputStream = httpURLConnection.getInputStream();
+                    reader = new InputStreamReader(inputStream);
+                    data = reader.read();
+                    String content="";
+                    while (data != -1) {
+                        char current = (char) data;
+                        content += current;
+                        data = reader.read();
+                    }
+                    videoDetailsList.clear();
+                    JSONObject jsonObjectVideo = new JSONObject(content);
+                    JSONArray jsonArrayVideo = jsonObjectVideo.getJSONArray("results");
+                    for(int j=0;j<jsonArrayVideo.length();j++){
+                        JSONObject videoPart = jsonArrayVideo.getJSONObject(j);
+                        key = videoPart.getString("key");
+                        trailerName = videoPart.getString("name");
+                        trailerSite = videoPart.getString("site");
+                        videoDetails = new VideoDetails(key,trailerName,trailerSite);
+                    }
+
+                    videoDetailsList.add(videoDetails);
+                    videoMap.put(Integer.parseInt(movie_id),videoDetailsList);
+
                 }
-                //adapter = new MovieAdapter(getApplicationContext(),MovieDetailList);
-                //gridView.setAdapter(new MovieAdapter(getApplicationContext(),MovieDetailList));
+
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
@@ -185,7 +175,35 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             updateList();
+            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Log.i("clicked","clciked");
+                manager=getFragmentManager();
+                    fetchedList.clear();
+                    Details fragment = (Details) manager.findFragmentById(R.id.fragment);
+                    MovieInfo clicked = MovieDetailList.get(position);
+                    String idToMatch = clicked.movieId;
+                    Log.i("id",idToMatch);
+                    fetchedList = videoMap.get(Integer.parseInt(idToMatch));
+                    VideoDetails fetchedObject = fetchedList.get(0);
+                    Log.i("key",fetchedObject.key);
+                    if(fragment != null && fragment.isVisible()){
+                        fragment.changeData(clicked.posterURL,clicked.title,clicked.overview,clicked.votes);
+                    }
+                    else{
+                        Intent intent = new Intent(getApplicationContext(),DetailView.class);
+                        intent.putExtra("Title",clicked.title);
+                        intent.putExtra("OverView",clicked.overview);
+                        intent.putExtra("Url",clicked.posterURL);
+                        intent.putExtra("Rating",clicked.votes);
+
+                        startActivity(intent);
+                    }
+                }
+            });
             adapter.notifyDataSetChanged();
+
            // gridView.setAdapter(adapter);
         }
     }
@@ -193,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Log.i("Updating List","updated");
         //details = null;
         Cursor c = movieDB.rawQuery("SELECT * FROM Movie_details", null);
+        int idIndex = c.getColumnIndex("movieId");
         int posterIndex = c.getColumnIndex("posterURL");
         int popularityIndex = c.getColumnIndex("rating");
         int titleIndex = c.getColumnIndex("title");
@@ -201,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         int language = c.getColumnIndex("language");
         c.moveToFirst();
         while( c != null && !c.isAfterLast()){
-            details = new MovieInfo(c.getString(posterIndex),c.getString(popularityIndex),c.getString(titleIndex),c.getString(overViewIndex),c.getString(language),c.getString(votesIndex));
+            details = new MovieInfo(c.getString(idIndex),c.getString(posterIndex),c.getString(popularityIndex),c.getString(titleIndex),c.getString(overViewIndex),c.getString(language),c.getString(votesIndex));
             MovieDetailList.add(details);
             c.moveToNext();
         }
@@ -214,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
         MovieDetails movieDetails = new MovieDetails();
         movieDB = this.openOrCreateDatabase("Movies",MODE_PRIVATE,null);
-        movieDB.execSQL("CREATE TABLE IF NOT EXISTS Movie_details (id INTEGER PRIMARY KEY,posterURL VARCHAR,title VARCHAR,duration VARCHAR,rating VARCHAR,votes VARCHAR,overview VARCHAR,language VARCHAR)");
+        movieDB.execSQL("CREATE TABLE IF NOT EXISTS Movie_details (id INTEGER PRIMARY KEY,movieId VARCHAR,posterURL VARCHAR,title VARCHAR,duration VARCHAR,rating VARCHAR,votes VARCHAR,overview VARCHAR,language VARCHAR)");
         updateList();
         gridView = (GridView)findViewById(R.id.gridView);
         adapter = new MovieAdapter(getApplicationContext(),MovieDetailList);
@@ -224,21 +243,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } catch (Exception e){
             e.printStackTrace();
         }
-        //Spinner spinner = (Spinner)findViewById(R.id.spinner);
-       // ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(this,R.array.sortBy_list,android.R.layout.simple_spinner_item);
-        //arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //spinner.setAdapter(arrayAdapter);
-        //GridView gridView = (GridView)findViewById(R.id.gridView);
-
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String item = parent.getItemAtPosition(position).toString();
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
 }
