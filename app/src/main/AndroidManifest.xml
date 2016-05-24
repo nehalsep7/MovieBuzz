@@ -26,6 +26,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.moviebuzzapp.MainActivity" />
         </activity>
+        <activity
+            android:name=".VideoActivity"
+            android:label="@string/title_activity_video"
+            android:parentActivityName=".DetailView"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.moviebuzzapp.DetailView" />
+        </activity>
     </application>
 
 </manifest>

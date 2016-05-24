@@ -26,7 +26,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/titleView"
-        android:layout_margin="15dp">
+        android:layout_margin="15dp"
+        android:id="@+id/scrollView">
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -121,6 +122,37 @@
                 android:background="#424242"
                 android:layout_marginTop="15dp">
             </View>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/videoLayout">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/videoButton"
+                    android:layout_marginBottom="85dp"
+                    android:src="@drawable/play"
+                    android:layout_marginTop="10dp"
+                    android:focusable="false"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Play Trailer"
+                    android:id="@+id/videoName"
+                    android:layout_alignBottom="@+id/videoButton"
+                    android:layout_toEndOf="@+id/videoButton"
+                    android:layout_alignParentTop="true"
+                    android:gravity="center_vertical"
+                    android:textSize="35dp"
+                    android:textStyle="bold"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:focusable="false"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
