@@ -31,40 +31,8 @@ public class LoginActivityFragment extends Fragment {
     private AccessTokenTracker tracker;
     private ProfileTracker profileTracker;
     private Profile profile;
-    private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
-        @Override
-        public void onSuccess(LoginResult loginResult) {
-            Log.i("Result: ","Success");
-            AccessToken accessToken = loginResult.getAccessToken();
-            profile = Profile.getCurrentProfile();
-            if(profile == null){
-                profileTracker = new ProfileTracker() {
-                    @Override
-                    protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-                        Log.i("Changed", "Profile Changed");
-                        if(currentProfile != null){
-                            currentProfile.getName();
-                        }
+    LoginButton loginButton;
 
-                    }
-                };
-            }
-            else{
-                Log.i("Else","Profile Changed");
-                profile.getName();
-            }
-        }
-
-        @Override
-        public void onCancel() {
-
-        }
-
-        @Override
-        public void onError(FacebookException error) {
-
-        }
-    };
     public LoginActivityFragment() {
     }
 
@@ -83,6 +51,15 @@ public class LoginActivityFragment extends Fragment {
             @Override
             protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
                 Log.i("Changed", "Profile Changed");
+                profile = currentProfile;
+                if(profile == null){
+                    Log.i("Current Profile ","Null");
+                }
+                else{
+                    Log.i("Current Profile ","Not Null");
+                    Log.i("Current Name: ", profile.getName());
+                }
+
             }
         };
         tracker.startTracking();
@@ -92,32 +69,37 @@ public class LoginActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_login, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        LoginButton loginButton = (LoginButton)view.findViewById(R.id.login_button);
+        View view =  inflater.inflate(R.layout.fragment_login, container, false);
+        loginButton = (LoginButton)view.findViewById(R.id.login_button);
         loginButton.setReadPermissions(Arrays.asList("email","public_profile","user_friends"));
         loginButton.setFragment(this);
-        loginButton.registerCallback(callbackManager,mCallback);
-//        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-//            @Override
-//            public void onSuccess(LoginResult loginResult) {
-//                // App code
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//                // App code
-//            }
-//
-//            @Override
-//            public void onError(FacebookException exception) {
-//                // App code
-//            }
-//        });
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+            Log.i("Message","Success");
+                
+                profile = Profile.getCurrentProfile();
+                if(profile == null){
+                    Log.i("Profile: "," Null");
+                }
+                else{
+                    Log.i("Profile: "," Not Null");
+                    Log.i("Name: ", profile.getName());
+
+                }
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        });
+        return view;
     }
 
     @Override
