@@ -149,6 +149,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             movie_type = "Now Playing";
             movieType.setText(movie_type);
             fetchData(idValue);
+        }else if(id == R.id.login){
+            Log.i("Login","Login");
+            Intent intentLogin = new Intent(getApplicationContext(),LoginActivity.class);
+            startActivity(intentLogin);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
