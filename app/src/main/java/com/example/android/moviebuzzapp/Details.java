@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -29,6 +30,8 @@ public class Details extends Fragment {
     ImageButton movieButton;
     RelativeLayout videoLayouts;
     String key_video;
+    Button favorites;
+
     public Details() {
         // Required empty public constructor
     }
@@ -41,41 +44,33 @@ public class Details extends Fragment {
 
         rootView = inflater.inflate(R.layout.fragment_details, container, false);
         imageView = (ImageView) rootView.findViewById(R.id.imageView);
-        Log.i("Image View",imageView.toString());
+        //Log.i("Image View",imageView.toString());
         textView = (TextView)rootView.findViewById(R.id.overview);
         titleView = (TextView)rootView.findViewById(R.id.titleView);
         videoLayouts = (RelativeLayout)rootView.findViewById(R.id.videoLayout);
+        favorites = (Button)rootView.findViewById(R.id.favoriteButton);
+        favorites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(favorites.getText().toString().equalsIgnoreCase("Mark As Favourite")){
+                    favorites.setText("Remove From Favorites");
+                }else{
+                    favorites.setText("Mark As Favourite");
+                }
+            }
+        });
         videoLayouts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("Clicked","Play Trailer");
             }
         });
-//        movieButton = (ImageButton)rootView.findViewById(R.id.videoButton);
-//        movieButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.i("Clicked","Play Trailer");
-//                Intent intent = new Intent(getActivity(), VideoActivity.class);
-//                intent.putExtra("Key",key_video);
-//                startActivity(intent);
-//            }
-//        });
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        movieButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.i("Clicked", "Play Trailer");
-//                Intent intent = new Intent(getActivity(), VideoActivity.class);
-//                intent.putExtra("Key", key_video);
-//                startActivity(intent);
-//            }
-//        });
     }
 
     public void changeData(String posterUrl,String title,String overview,String rating,String key){

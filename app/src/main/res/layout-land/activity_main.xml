@@ -11,7 +11,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Popular"
-            android:id="@+id/textView"
+            android:id="@+id/profileEmail"
             android:textStyle="bold"
             android:textSize="35dp"
             android:padding="10dp" />

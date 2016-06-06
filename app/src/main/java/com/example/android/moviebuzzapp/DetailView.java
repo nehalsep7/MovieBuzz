@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ public class DetailView extends AppCompatActivity {
     ImageButton movieButton;
     private static String Title,Overview,PosterUrl,Rating;
     private static ArrayList<String> keys_videos;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("Inside DetailView", "Detail View");
@@ -30,11 +30,6 @@ public class DetailView extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Intent i = getIntent();
-//        if(savedInstanceState != null){
-//            Title = savedInstanceState.getString("Title");
-//            Log.i("TitleSaved",Title);
-//        }
-//        else{
         if(i.getStringExtra("Title") != null){
             Title = i.getStringExtra("Title");
         }
@@ -50,19 +45,13 @@ public class DetailView extends AppCompatActivity {
         if(i.getStringArrayListExtra("Keys") != null){
             keys_videos = i.getStringArrayListExtra("Keys");
         }
-        //Log.i("Size", String.valueOf(keys_videos.size()));
         if(keys_videos.size() != 0){
-           // Log.i("keys_videos", String.valueOf(keys_videos));
             key_data = keys_videos.get(0);
         }
         else{
             key_data = " ";
         }
 
-//        for(String keyValue : keys_videos){
-//            Log.i("key Value",keyValue);
-//        }
-//        Log.i("Size", String.valueOf(keys_videos.size()));
         movieButton = (ImageButton)findViewById(R.id.videoButton);
         movieButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -18,6 +18,10 @@
             android:id="@+id/now_playing"
             android:icon="@drawable/ic_menu_manage"
             android:title="Now Playing" />
+        <item
+            android:id="@+id/faviorites"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="My Faviorites" />
 
     </group>
 
